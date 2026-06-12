@@ -1,0 +1,446 @@
+---
+import { SITE } from '../config';
+
+interface Props {
+  id?: string;
+  source?: string;
+  title?: string;
+  subtitle?: string;
+  eyebrow?: string;
+}
+
+const {
+  id = 'contact',
+  source = 'homepage',
+  title = 'Get a quote in under a minute',
+  subtitle = 'Tell us what you need. We will review your enquiry and come back with the right next step.',
+  eyebrow = 'Quick Enquiry',
+} = Astro.props;
+
+const formEmail = 'info@jaynxenterprises.co.ke';
+---
+
+<section class="quote-section" id={id}>
+  <div class="container quote-shell">
+    <div class="quote-copy">
+      <span class="quote-eyebrow">{eyebrow}</span>
+      <h2 class="quote-title">{title}</h2>
+      <p class="quote-subtitle">{subtitle}</p>
+
+      <div class="quote-points">
+        <div class="quote-point">
+          <strong>Best for:</strong> business owners and procurement teams who need pricing quickly without a long call.
+        </div>
+        <div class="quote-point">
+          <strong>What we cover:</strong> Industrial supplies, pipe &amp; valve solutions, fabrication services, bulk orders, and on-site work.
+        </div>
+        <div class="quote-point">
+          <strong>Prefer chat?</strong>{' '}
+          <a
+            href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent("Hi Jaynx Enterprises, I'd prefer to get my quote on WhatsApp.")}`}
+            target="_blank"
+            rel="noopener"
+            data-conversion="whatsapp"
+          >
+            Send us a WhatsApp message instead
+          </a>.
+        </div>
+      </div>
+    </div>
+
+    <form
+      class="quote-form"
+      data-quote-form-panel
+      data-quote-source={source}
+      data-formsubmit-email={formEmail}
+      novalidate
+    >
+      <input type="hidden" name="source" value={source} />
+
+      <div class="form-row">
+        <label for={`${id}-name`}>Your name</label>
+        <input id={`${id}-name`} name="name" type="text" placeholder="John Kamau" required />
+        <p class="field-error" data-error-for="name" aria-live="polite"></p>
+      </div>
+
+      <div class="form-row">
+        <label for={`${id}-company`}>Company name</label>
+        <input id={`${id}-company`} name="company" type="text" placeholder="Acme Industries Ltd" required />
+        <p class="field-error" data-error-for="company" aria-live="polite"></p>
+      </div>
+
+      <div class="form-row">
+        <label for={`${id}-phone`}>Phone / WhatsApp</label>
+        <input id={`${id}-phone`} name="phone" type="tel" placeholder="+254 7XX XXX XXX" required />
+        <p class="field-error" data-error-for="phone" aria-live="polite"></p>
+      </div>
+
+      <div class="form-row">
+        <label for={`${id}-service`}>What do you need?</label>
+        <select id={`${id}-service`} name="enquiryType" required>
+          <option value="">Select one</option>
+          <option value="Industrial Supplies">Industrial Supplies (tools, hoses, bearings…)</option>
+          <option value="Pipe & Valve Solutions">Pipe &amp; Valve Solutions</option>
+          <option value="Fabrication Services">Fabrication Services (tanks, cutting, metalwork)</option>
+          <option value="Health & Safety Equipment">Health &amp; Safety Equipment</option>
+          <option value="Agricultural Equipment">Agricultural Equipment</option>
+          <option value="Bulk / Custom Order">Bulk / Custom Order</option>
+          <option value="Not sure yet">Not sure yet — just exploring</option>
+        </select>
+        <p class="field-error" data-error-for="enquiryType" aria-live="polite"></p>
+      </div>
+
+      <p class="quote-status" role="status" aria-live="polite"></p>
+
+      <button
+        type="submit"
+        class="quote-submit"
+        data-idle-label="Send my enquiry"
+        data-loading-label="Sending your details..."
+      >
+        Send my enquiry
+      </button>
+      <p class="quote-note">We typically respond within a few hours. WhatsApp stays open if you need a faster reply.</p>
+    </form>
+  </div>
+</section>
+
+<script is:inline define:vars={{ whatsapp: SITE.whatsapp }}>
+  if (typeof window !== 'undefined') {
+    const requiredFields = ['name', 'company', 'phone', 'enquiryType'];
+
+    const getField = function (form, name) {
+      return form.querySelector(`[name="${name}"]`);
+    };
+
+    const getValue = function (form, name) {
+      const field = getField(form, name);
+      return field instanceof HTMLInputElement ||
+        field instanceof HTMLTextAreaElement ||
+        field instanceof HTMLSelectElement
+        ? field.value.trim()
+        : '';
+    };
+
+    const setFieldError = function (form, name, message) {
+      const field = getField(form, name);
+      const error = form.querySelector(`[data-error-for="${name}"]`);
+      if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement || field instanceof HTMLSelectElement) {
+        field.setAttribute('aria-invalid', 'true');
+      }
+      if (error instanceof HTMLElement) error.textContent = message;
+    };
+
+    const clearFieldError = function (form, name) {
+      const field = getField(form, name);
+      const error = form.querySelector(`[data-error-for="${name}"]`);
+      if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement || field instanceof HTMLSelectElement) {
+        field.removeAttribute('aria-invalid');
+      }
+      if (error instanceof HTMLElement) error.textContent = '';
+    };
+
+    const setStatus = function (form, message, state) {
+      const status = form.querySelector('.quote-status');
+      if (!(status instanceof HTMLElement)) return;
+      status.textContent = message;
+      status.dataset.state = state || '';
+    };
+
+    const setSubmitting = function (form, isSubmitting) {
+      const button = form.querySelector('.quote-submit');
+      if (!(button instanceof HTMLButtonElement)) return;
+      form.dataset.submitting = isSubmitting ? 'true' : 'false';
+      form.setAttribute('aria-busy', isSubmitting ? 'true' : 'false');
+      button.disabled = isSubmitting;
+      button.textContent = isSubmitting
+        ? button.dataset.loadingLabel || 'Sending your details...'
+        : button.dataset.idleLabel || 'Send my enquiry';
+    };
+
+    const buildWhatsAppMessage = function (fields) {
+      return [
+        'Hello Jaynx Enterprises, I would like a quote.',
+        '',
+        `Name: ${fields.name}`,
+        `Company: ${fields.company}`,
+        `Phone: ${fields.phone}`,
+        `Enquiry: ${fields.enquiryType}`,
+        '',
+        'Please share the next steps.',
+      ].join('\n');
+    };
+
+    const validateForm = function (form) {
+      let isValid = true;
+      requiredFields.forEach((name) => {
+        clearFieldError(form, name);
+        if (!getValue(form, name)) {
+          isValid = false;
+          setFieldError(form, name, 'This field is required.');
+        }
+      });
+      return isValid;
+    };
+
+    document.querySelectorAll('.quote-form').forEach((form) => {
+      form.addEventListener('input', function (event) {
+        const target = event.target;
+        if (
+          !(target instanceof HTMLInputElement) &&
+          !(target instanceof HTMLTextAreaElement) &&
+          !(target instanceof HTMLSelectElement)
+        ) return;
+        if (requiredFields.includes(target.name)) clearFieldError(form, target.name);
+      });
+
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        if (form.dataset.submitting === 'true') return;
+
+        setStatus(form, '', '');
+
+        if (!validateForm(form)) {
+          setStatus(form, 'Please fill in the required fields before continuing.', 'error');
+          return;
+        }
+
+        const formSubmitEmail = form.getAttribute('data-formsubmit-email');
+        const fields = {
+          name: getValue(form, 'name'),
+          company: getValue(form, 'company'),
+          phone: getValue(form, 'phone'),
+          enquiryType: getValue(form, 'enquiryType'),
+        };
+
+        if (!formSubmitEmail) {
+          setStatus(form, 'The form is not configured correctly. Please try WhatsApp instead.', 'error');
+          return;
+        }
+
+        setSubmitting(form, true);
+        setStatus(form, 'Sending your details...', 'loading');
+
+        const payload = new FormData();
+        payload.append('_captcha', 'false');
+        payload.append('_template', 'table');
+        payload.append('_subject', `New enquiry: ${fields.enquiryType}`);
+        payload.append('source', form.getAttribute('data-quote-source') || 'website');
+        payload.append('name', fields.name);
+        payload.append('company', fields.company);
+        payload.append('phone', fields.phone);
+        payload.append('enquiryType', fields.enquiryType);
+
+        try {
+          const response = await fetch(`https://formsubmit.co/ajax/${formSubmitEmail}`, {
+            method: 'POST',
+            headers: { Accept: 'application/json' },
+            body: payload,
+          });
+
+          let result = null;
+          try { result = await response.json(); } catch {}
+
+          const saveSucceeded =
+            response.ok &&
+            (!result || !result.errors || result.errors.length === 0) &&
+            (!result || result.success === undefined || `${result.success}`.toLowerCase() === 'true');
+
+          if (!saveSucceeded) throw new Error('Submit failed');
+
+          setStatus(form, 'Saved. Opening WhatsApp...', 'success');
+
+          const waUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent(
+            [
+              'Hello Jaynx Enterprises, I would like a quote.',
+              '',
+              `Name: ${fields.name}`,
+              `Company: ${fields.company}`,
+              `Phone: ${fields.phone}`,
+              `Enquiry: ${fields.enquiryType}`,
+              '',
+              'Please share the next steps.',
+            ].join('\n')
+          )}`;
+
+          window.setTimeout(function () { window.location.assign(waUrl); }, 180);
+        } catch {
+          setSubmitting(form, false);
+          setStatus(form, 'We could not save your request right now. Please try again or message us on WhatsApp.', 'error');
+        }
+      });
+    });
+
+    document.addEventListener('click', function (event) {
+      const target = event.target instanceof Element
+        ? event.target.closest('a[href="/#contact"], a[href="#contact"]')
+        : null;
+      if (!(target instanceof HTMLAnchorElement)) return;
+
+      const url = new URL(target.href, window.location.origin);
+      if (url.pathname !== window.location.pathname || url.hash !== '#contact') return;
+
+      event.preventDefault();
+      window.history.replaceState(null, '', '#contact');
+      const section = document.getElementById('contact');
+      const formPanel = section?.querySelector('[data-quote-form-panel]');
+      if (formPanel instanceof HTMLElement) {
+        const headerOffset = window.innerWidth <= 768 ? 88 : 104;
+        const top = window.scrollY + formPanel.getBoundingClientRect().top - headerOffset - 20;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      } else {
+        section?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  }
+</script>
+
+<style>
+  .quote-section {
+    background: #f7f8fc;
+    padding: 88px 0;
+    border-top: 1px solid #e8ecf4;
+    border-bottom: 1px solid #e8ecf4;
+  }
+
+  .quote-shell {
+    display: grid;
+    grid-template-columns: 1fr 460px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  .quote-copy { max-width: 580px; }
+
+  .quote-eyebrow {
+    display: inline-block;
+    margin-bottom: 16px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #e8efff;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .quote-title {
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.1;
+    margin-bottom: 14px;
+  }
+
+  .quote-subtitle {
+    font-size: 17px;
+    color: #5b6b84;
+    line-height: 1.7;
+    margin-bottom: 26px;
+  }
+
+  .quote-points { display: grid; gap: 14px; }
+
+  .quote-point {
+    font-size: 15px;
+    line-height: 1.65;
+    color: #445065;
+  }
+
+  .quote-point strong { color: #111827; }
+
+  .quote-point a {
+    color: #2563eb;
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+
+  .quote-form {
+    background: #ffffff;
+    border: 1px solid #dfe7f5;
+    border-radius: 20px;
+    box-shadow: 0 18px 44px rgba(148, 163, 184, 0.14);
+    padding: 28px;
+    display: grid;
+    gap: 16px;
+  }
+
+  .form-row { display: grid; gap: 6px; }
+
+  .form-row label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  .form-row input,
+  .form-row select {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1px solid #cfd8ea;
+    border-radius: 10px;
+    background: #ffffff;
+    font: inherit;
+    color: #111827;
+  }
+
+  .form-row input:focus,
+  .form-row select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  }
+
+  .field-error {
+    min-height: 18px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #b42318;
+  }
+
+  .quote-status {
+    min-height: 22px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #445065;
+  }
+
+  .quote-status[data-state='error']   { color: #b42318; }
+  .quote-status[data-state='success'] { color: #17603a; }
+
+  .quote-submit {
+    min-height: 50px;
+    border: none;
+    border-radius: 10px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.18s ease, transform 0.18s ease;
+  }
+
+  .quote-submit:hover    { background: #1d4ed8; transform: translateY(-1px); }
+  .quote-submit:disabled { background: #8cb0fa; cursor: wait; transform: none; }
+
+  .quote-form [aria-invalid='true'] {
+    border-color: #d92d20;
+    box-shadow: 0 0 0 3px rgba(217, 45, 32, 0.12);
+  }
+
+  .quote-note {
+    font-size: 12px;
+    line-height: 1.6;
+    color: #7a869a;
+  }
+
+  @media (max-width: 900px) {
+    .quote-shell { grid-template-columns: 1fr; }
+    .quote-copy { max-width: none; }
+  }
+
+  @media (max-width: 520px) {
+    .quote-section { padding: 64px 0; }
+    .quote-form { padding: 22px 18px; }
+  }
+</style>

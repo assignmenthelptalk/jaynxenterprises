@@ -1,0 +1,217 @@
+---
+import { SITE } from '../config';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  canonical?: string;
+}
+
+const siteUrl = 'https://jaynxenterprises.co.ke';
+
+const {
+  title = `Industrial Supplies Nairobi | ${SITE.name} — Tools, Pipes, Valves & Fabrication`,
+  description = SITE.description,
+  ogImage = `${siteUrl}/favicon.svg`,
+  canonical,
+} = Astro.props;
+
+const currentUrl = canonical ?? Astro.url?.toString() ?? siteUrl;
+const normalizedOgImage = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}`;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={currentUrl} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={currentUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={normalizedOgImage} />
+    <meta property="og:locale" content="en_KE" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={normalizedOgImage} />
+
+    <slot name="head" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --accent: #2563eb;
+    --accent-dark: #1d4ed8;
+    --dark: #111111;
+    --dark2: #1a1a1a;
+    --mid: #111111;
+    --muted: #666666;
+    --light: #f7f7f5;
+    --white: #ffffff;
+    --border: #e5e5e5;
+    --font-display: 'IBM Plex Sans', Arial, sans-serif;
+    --font-body: 'IBM Plex Sans', Arial, sans-serif;
+    --font-reading: 'Manrope', Arial, sans-serif;
+    --radius: 4px;
+    --radius-lg: 10px;
+    --transition: 0.2s ease;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-body);
+    color: var(--muted);
+    background: var(--white);
+    font-weight: 400;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3,
+  .section-title, .hero-title, .service-name,
+  .step-title, .t-heading, .services-heading,
+  .portfolio-name, .faq-q {
+    font-family: var(--font-display);
+    font-weight: 800;
+    color: #111111;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    text-rendering: optimizeLegibility;
+    font-synthesis-weight: none;
+  }
+
+  h3, .service-name, .step-title, .portfolio-name {
+    font-weight: 700;
+  }
+
+  img {
+    max-width: 100%;
+    display: block;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  a[href^="/"]:not(.btn):not(.logo):not(.footer-logo):not(.menu-link),
+  a[href^="#"]:not(.btn):not(.logo):not(.footer-logo):not(.menu-link) {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.18em;
+  }
+
+  a[href^="/"]:not(.btn):not(.logo):not(.footer-logo):not(.menu-link):hover,
+  a[href^="#"]:not(.btn):not(.logo):not(.footer-logo):not(.menu-link):hover {
+    color: var(--accent-dark);
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .section {
+    padding: 80px 0;
+  }
+
+  .section-sm {
+    padding: 48px 0;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: var(--radius);
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background var(--transition), color var(--transition), border-color var(--transition);
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--white);
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-dark);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--dark);
+    border: 1.5px solid var(--border);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--dark);
+  }
+
+  .section-label {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-size: clamp(28px, 4vw, 48px);
+    margin-bottom: 16px;
+  }
+
+  .section-sub {
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      padding: 0 16px;
+    }
+  }
+</style>

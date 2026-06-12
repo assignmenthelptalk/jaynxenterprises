@@ -1,0 +1,181 @@
+---
+import { SITE } from '../config';
+---
+
+<section class="stats-section" id="stats">
+  <div class="container">
+    <div class="stats-grid">
+      {SITE.stats.map((stat) => (
+        <div class="stat-item">
+          <p class="stat-value" data-count={stat.value}>{stat.value}</p>
+          <p class="stat-label">{stat.label}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div class="brands-bar" id="industries">
+    <div class="container brands-inner">
+      <p class="brands-label">Industries we serve</p>
+      <div class="brands-pills">
+        {SITE.brands.map((brand) => (
+          <span class="brand-pill">{brand}</span>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .stats-section {
+    background: #ffffff;
+    padding: 0 0 64px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    background: #ffffff;
+    border: 1px solid #e8ecf4;
+    border-radius: 16px;
+    box-shadow: 0 2px 24px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+  }
+
+  .stat-item {
+    text-align: left;
+    padding: 36px 40px;
+    border-right: 1px solid #e8ecf4;
+  }
+
+  .stat-item:last-child {
+    border-right: none;
+  }
+
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 48px;
+    font-weight: 800;
+    color: #3d5af1;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #888888;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    line-height: 1.4;
+  }
+
+  .brands-bar {
+    border-top: 1px solid #ebebeb;
+    padding: 28px 0 0;
+  }
+
+  .brands-inner {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .brands-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #aaaaaa;
+    flex-shrink: 0;
+  }
+
+  .brands-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .brand-pill {
+    background: #f5f6fa;
+    border: 1px solid #e8ecf4;
+    color: #666666;
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  @media (max-width: 600px) {
+    .stats-grid { grid-template-columns: 1fr; }
+
+    .stat-item {
+      padding: 28px;
+      border-right: none;
+      border-bottom: 1px solid #e8ecf4;
+    }
+
+    .stat-item:last-child { border-bottom: none; }
+
+    .stat-value { font-size: 40px; }
+
+    .brands-inner {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+  }
+</style>
+
+<script>
+  function parseCount(raw: string): { num: number; suffix: string } | null {
+    const match = raw.match(/^(\d[\d,]*)(.*)/);
+    if (!match) return null;
+    return { num: parseInt(match[1].replace(/,/g, ''), 10), suffix: match[2] };
+  }
+
+  function easeOutCubic(t: number): number {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function formatNum(n: number): string {
+    if (n >= 1000) return n.toLocaleString();
+    return String(n);
+  }
+
+  function animateStat(el: HTMLElement): void {
+    const raw = el.dataset.count ?? '';
+    const parsed = parseCount(raw);
+    if (!parsed) return;
+    const { num, suffix } = parsed;
+    const duration = 1600;
+    const startTime = performance.now();
+
+    function tick(now: number): void {
+      const progress = Math.min((now - startTime) / duration, 1);
+      el.textContent = formatNum(Math.round(easeOutCubic(progress) * num)) + suffix;
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  const statEls = document.querySelectorAll<HTMLElement>('.stat-value[data-count]');
+  const section = document.querySelector('.stats-section');
+
+  if (section && statEls.length) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          statEls.forEach(animateStat);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(section);
+  }
+</script>
