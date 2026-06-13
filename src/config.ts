@@ -3,8 +3,8 @@ export const SITE = {
   tagline: 'Industrial supplies, pipe solutions & custom fabrication for East Africa',
   description:
     'Nairobi-based industrial supplier. Tools, pipes, valves, hoses, bearings, and custom fabrication — serving manufacturing, agricultural, and construction sectors across East Africa.',
-  phone: '+254 722 000 000',
-  whatsapp: '254722000000',
+  phone: '+254 705 954 325',
+  whatsapp: '254705954325',
   email: 'info@jaynxenterprises.co.ke',
   address: 'Industrial Area, Nairobi, Kenya',
 
