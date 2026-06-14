@@ -36,30 +36,30 @@ import { SITE } from '../config';
       <div class="showcase-card">
         <p class="showcase-label">What we supply</p>
         <div class="showcase-grid">
-          <div class="showcase-item">
+          <a href="/products/fasteners-hardware" class="showcase-item">
             <span class="showcase-icon">🔧</span>
             <span class="showcase-name">Industrial Tools</span>
-          </div>
-          <div class="showcase-item">
+          </a>
+          <a href="/products/piping-valves" class="showcase-item">
             <span class="showcase-icon">🔩</span>
             <span class="showcase-name">Pipe Fittings</span>
-          </div>
-          <div class="showcase-item">
+          </a>
+          <a href="/products/electrical-motors" class="showcase-item">
             <span class="showcase-icon">⚙️</span>
             <span class="showcase-name">Pumps & Motors</span>
-          </div>
-          <div class="showcase-item">
+          </a>
+          <a href="/products/air-pneumatic" class="showcase-item">
             <span class="showcase-icon">🌀</span>
             <span class="showcase-name">Hoses & Couplings</span>
-          </div>
-          <div class="showcase-item">
+          </a>
+          <a href="/products/boiler-steam" class="showcase-item">
             <span class="showcase-icon">🔑</span>
             <span class="showcase-name">Valves & Actuators</span>
-          </div>
-          <div class="showcase-item">
+          </a>
+          <a href="/products/crusher-processing" class="showcase-item">
             <span class="showcase-icon">🏗️</span>
             <span class="showcase-name">Fabrication</span>
-          </div>
+          </a>
         </div>
         <div class="showcase-footer">
           <span class="showcase-badge">1,000+ products in stock</span>
@@ -241,7 +241,9 @@ import { SITE } from '../config';
     border: 1px solid #e2e8f6;
     border-radius: 10px;
     padding: 12px 14px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    text-decoration: none;
+    color: inherit;
   }
 
   .showcase-item:hover {
