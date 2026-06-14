@@ -57,16 +57,10 @@ import Footer from '../components/Footer.astro';
           <h2 class="form-title">Quote Request Form</h2>
 
           <form
-            action="https://formsubmit.co/info@jaynxenterprises.co.ke"
-            method="POST"
             class="quote-form"
             id="quoteForm"
+            novalidate
           >
-            <!-- FormSubmit config -->
-            <input type="hidden" name="_subject" value="New Quote Request — Jaynx Enterprises" />
-            <input type="hidden" name="_captcha" value="false" />
-            <input type="hidden" name="_template" value="table" />
-            <input type="text" name="_honey" style="display:none" />
 
             <div class="form-row">
               <div class="field">
@@ -112,7 +106,7 @@ import Footer from '../components/Footer.astro';
             </div>
 
             <button type="submit" class="btn btn-primary submit-btn">
-              Send Quote Request
+              Send via WhatsApp
             </button>
           </form>
         </div>
@@ -131,6 +125,42 @@ import Footer from '../components/Footer.astro';
     const input = document.getElementById('product') as HTMLInputElement | null;
     if (input) input.value = productParam;
   }
+
+  // Submit → WhatsApp
+  const form = document.getElementById('quoteForm') as HTMLFormElement | null;
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const get = (id: string) =>
+      (document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement | null)?.value.trim() ?? '';
+
+    const name    = get('name');
+    const company = get('company');
+    const email   = get('email');
+    const phone   = get('phone');
+    const product = get('product');
+    const message = get('message');
+
+    if (!name || !product) {
+      alert('Please fill in your name and the part / product field.');
+      return;
+    }
+
+    const lines = [
+      'Hello Jaynx Enterprises, I would like a quote.',
+      '',
+      `Name: ${name}`,
+      company ? `Company: ${company}` : '',
+      email   ? `Email: ${email}`     : '',
+      phone   ? `Phone: ${phone}`     : '',
+      `Part / Product: ${product}`,
+      message ? `Details: ${message}` : '',
+      '',
+      'Please advise on availability and pricing.',
+    ].filter((l, i, arr) => !(l === '' && arr[i - 1] === ''));
+
+    const waUrl = `https://wa.me/254705954325?text=${encodeURIComponent(lines.join('\n'))}`;
+    window.location.assign(waUrl);
+  });
 </script>
 
 <style>

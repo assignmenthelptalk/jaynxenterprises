@@ -95,12 +95,12 @@ const formEmail = 'info@jaynxenterprises.co.ke';
       <button
         type="submit"
         class="quote-submit"
-        data-idle-label="Send my enquiry"
-        data-loading-label="Sending your details..."
+        data-idle-label="Send via WhatsApp"
+        data-loading-label="Opening WhatsApp..."
       >
-        Send my enquiry
+        Send via WhatsApp
       </button>
-      <p class="quote-note">We typically respond within a few hours. WhatsApp stays open if you need a faster reply.</p>
+      <p class="quote-note">Tapping the button opens WhatsApp with your details pre-filled — just hit send.</p>
     </form>
   </div>
 </section>
@@ -205,7 +205,6 @@ const formEmail = 'info@jaynxenterprises.co.ke';
           return;
         }
 
-        const formSubmitEmail = form.getAttribute('data-formsubmit-email');
         const fields = {
           name: getValue(form, 'name'),
           company: getValue(form, 'company'),
@@ -213,61 +212,20 @@ const formEmail = 'info@jaynxenterprises.co.ke';
           enquiryType: getValue(form, 'enquiryType'),
         };
 
-        if (!formSubmitEmail) {
-          setStatus(form, 'The form is not configured correctly. Please try WhatsApp instead.', 'error');
-          return;
-        }
+        const waUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent(
+          [
+            'Hello Jaynx Enterprises, I would like a quote.',
+            '',
+            `Name: ${fields.name}`,
+            `Company: ${fields.company}`,
+            `Phone: ${fields.phone}`,
+            `Enquiry: ${fields.enquiryType}`,
+            '',
+            'Please share the next steps.',
+          ].join('\n')
+        )}`;
 
-        setSubmitting(form, true);
-        setStatus(form, 'Sending your details...', 'loading');
-
-        const payload = new FormData();
-        payload.append('_captcha', 'false');
-        payload.append('_template', 'table');
-        payload.append('_subject', `New enquiry: ${fields.enquiryType}`);
-        payload.append('source', form.getAttribute('data-quote-source') || 'website');
-        payload.append('name', fields.name);
-        payload.append('company', fields.company);
-        payload.append('phone', fields.phone);
-        payload.append('enquiryType', fields.enquiryType);
-
-        try {
-          const response = await fetch(`https://formsubmit.co/ajax/${formSubmitEmail}`, {
-            method: 'POST',
-            headers: { Accept: 'application/json' },
-            body: payload,
-          });
-
-          let result = null;
-          try { result = await response.json(); } catch {}
-
-          const saveSucceeded =
-            response.ok &&
-            (!result || !result.errors || result.errors.length === 0) &&
-            (!result || result.success === undefined || `${result.success}`.toLowerCase() === 'true');
-
-          if (!saveSucceeded) throw new Error('Submit failed');
-
-          setStatus(form, 'Saved. Opening WhatsApp...', 'success');
-
-          const waUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent(
-            [
-              'Hello Jaynx Enterprises, I would like a quote.',
-              '',
-              `Name: ${fields.name}`,
-              `Company: ${fields.company}`,
-              `Phone: ${fields.phone}`,
-              `Enquiry: ${fields.enquiryType}`,
-              '',
-              'Please share the next steps.',
-            ].join('\n')
-          )}`;
-
-          window.setTimeout(function () { window.location.assign(waUrl); }, 180);
-        } catch {
-          setSubmitting(form, false);
-          setStatus(form, 'We could not save your request right now. Please try again or message us on WhatsApp.', 'error');
-        }
+        window.location.assign(waUrl);
       });
     });
 
