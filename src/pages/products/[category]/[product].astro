@@ -1,0 +1,144 @@
+﻿---
+import Base from '../../../layouts/Base.astro';
+import Navbar from '../../../components/Navbar.astro';
+import Footer from '../../../components/Footer.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import { products, getRelatedProducts, getCategoryBySlug } from '../../../data/products';
+import type { Product } from '../../../data/products';
+
+export async function getStaticPaths() {
+  return products.map(p => ({
+    params: { category: p.category, product: p.id },
+    props: { product: p },
+  }));
+}
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const category = getCategoryBySlug(product.category)!;
+const related = getRelatedProducts(product, 3);
+const hasSpecs = product.specifications && Object.keys(product.specifications).length > 0;
+---
+
+<Base
+  title={`${product.name} | ${category.name} | Jaynx Enterprises`}
+  description={product.description}
+>
+  <Navbar />
+
+  <div class="page-wrap">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: 'Home', href: '/' },
+        { label: 'Products', href: '/products' },
+        { label: category.name, href: `/products/${category.slug}` },
+        { label: product.name },
+      ]} />
+
+      <div class="product-layout">
+        <main class="product-main">
+          <div class="product-header">
+            <span class="cat-badge">
+              <span aria-hidden="true">{category.icon}</span>
+              <a href={`/products/${category.slug}`}>{category.name}</a>
+            </span>
+            <h1 class="product-title">{product.name}</h1>
+            <p class="product-description">{product.description}</p>
+          </div>
+
+          {hasSpecs && (
+            <section class="specs-section">
+              <h2 class="specs-heading">Specifications</h2>
+              <table class="specs-table">
+                <tbody>
+                  {Object.entries(product.specifications!).map(([key, value]) => (
+                    <tr>
+                      <th scope="row">{key}</th>
+                      <td>{value}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </section>
+          )}
+        </main>
+
+        <aside class="product-sidebar">
+          <div class="quote-card">
+            <span class="quote-badge">No prices listed</span>
+            <h2 class="quote-card-title">Request a Quote</h2>
+            <p class="quote-card-sub">Fill the short form and we will come back with availability, lead time, and pricing.</p>
+            <a href={`/contact?product=${encodeURIComponent(product.name)}`} class="btn btn-primary quote-btn">
+              Request a Quote for This Part
+            </a>
+            <div class="quote-divider"></div>
+            <div class="quote-alt">
+              <p>Prefer to call or message?</p>
+              <a href="https://wa.me/254705954325" class="wa-link" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                WhatsApp us
+              </a>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      {related.length > 0 && (
+        <section class="related-section">
+          <h2 class="related-heading">You may also need</h2>
+          <div class="related-grid">
+            {related.map(rel => (
+              <a href={`/products/${rel.category}/${rel.id}`} class="related-card">
+                <h3 class="related-name">{rel.name}</h3>
+                <p class="related-desc">{rel.description}</p>
+                <span class="related-link">View details &rarr;</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  </div>
+
+  <Footer />
+</Base>
+
+<style>
+  .page-wrap { padding-top: 96px; padding-bottom: 80px; min-height: 100vh; }
+  .product-layout { display: grid; grid-template-columns: 1fr 340px; gap: 48px; align-items: start; padding: 36px 0 60px; }
+  .product-header { margin-bottom: 40px; }
+  .cat-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--accent); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 12px; }
+  .cat-badge a { color: var(--accent); text-decoration: none; }
+  .cat-badge a:hover { color: var(--accent-dark); text-decoration: underline; }
+  .product-title { font-size: clamp(24px, 3.5vw, 40px); margin-bottom: 16px; color: var(--dark); }
+  .product-description { font-size: 16px; color: #444; line-height: 1.75; max-width: 680px; }
+  .specs-section { margin-top: 40px; }
+  .specs-heading { font-size: 18px; font-weight: 700; color: var(--dark); margin-bottom: 16px; }
+  .specs-table { width: 100%; border-collapse: collapse; font-size: 14px; max-width: 600px; }
+  .specs-table tr { border-bottom: 1px solid var(--border); }
+  .specs-table th { text-align: left; padding: 10px 16px 10px 0; font-weight: 600; color: var(--dark); width: 40%; vertical-align: top; }
+  .specs-table td { padding: 10px 0; color: #444; line-height: 1.5; }
+  .product-sidebar { position: sticky; top: 96px; }
+  .quote-card { background: var(--white); border: 2px solid var(--accent); border-radius: 16px; padding: 28px; }
+  .quote-badge { display: inline-block; background: #eef3ff; color: var(--accent); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; margin-bottom: 12px; }
+  .quote-card-title { font-size: 20px; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
+  .quote-card-sub { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+  .quote-btn { width: 100%; justify-content: center; padding: 14px 20px; font-size: 15px; font-weight: 700; border-radius: 8px; }
+  .quote-divider { height: 1px; background: var(--border); margin: 20px 0; }
+  .quote-alt p { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+  .wa-link { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: #16a34a; text-decoration: none; }
+  .wa-link:hover { color: #15803d; }
+  .related-section { padding-top: 20px; border-top: 1px solid var(--border); }
+  .related-heading { font-size: 20px; font-weight: 700; color: var(--dark); margin-bottom: 20px; }
+  .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .related-card { display: flex; flex-direction: column; background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 20px; text-decoration: none; color: inherit; transition: border-color var(--transition), box-shadow var(--transition); }
+  .related-card:hover { border-color: var(--accent); box-shadow: 0 4px 16px rgba(37,99,235,0.08); text-decoration: none; }
+  .related-name { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+  .related-desc { font-size: 13px; color: var(--muted); line-height: 1.6; flex: 1; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .related-link { font-size: 13px; font-weight: 600; color: var(--accent); }
+  @media (max-width: 900px) { .product-layout { grid-template-columns: 1fr; gap: 32px; } .product-sidebar { position: static; } .related-grid { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 560px) { .related-grid { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,267 @@
+﻿---
+import Base from '../layouts/Base.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Base
+  title="Request a Quote | Jaynx Enterprises"
+  description="Get a quote on industrial machine spare parts. Fast sourcing across East Africa — fill the short form and we will respond within 24 hours."
+>
+  <Navbar />
+
+  <div class="page-wrap">
+    <div class="container">
+      <div class="contact-layout">
+        <div class="contact-info">
+          <span class="section-label">Get in Touch</span>
+          <h1 class="section-title">Request a Quote</h1>
+          <p class="section-sub">
+            No pricing on the website — every order is sourced to your exact specification.
+            Fill the form and we will respond with availability, lead time, and a price.
+          </p>
+
+          <ul class="info-list">
+            <li>
+              <span class="info-icon" aria-hidden="true">📞</span>
+              <div>
+                <strong>Phone / WhatsApp</strong>
+                <a href="tel:+254705954325">+254 705 954 325</a>
+              </div>
+            </li>
+            <li>
+              <span class="info-icon" aria-hidden="true">📧</span>
+              <div>
+                <strong>Email</strong>
+                <a href="mailto:info@jaynxenterprises.co.ke">info@jaynxenterprises.co.ke</a>
+              </div>
+            </li>
+            <li>
+              <span class="info-icon" aria-hidden="true">📍</span>
+              <div>
+                <strong>Location</strong>
+                <span>Nairobi, Kenya — serving East Africa</span>
+              </div>
+            </li>
+            <li>
+              <span class="info-icon" aria-hidden="true">🕐</span>
+              <div>
+                <strong>Response time</strong>
+                <span>Within 24 hours on business days</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="form-card">
+          <h2 class="form-title">Quote Request Form</h2>
+
+          <form
+            action="https://formsubmit.co/info@jaynxenterprises.co.ke"
+            method="POST"
+            class="quote-form"
+            id="quoteForm"
+          >
+            <!-- FormSubmit config -->
+            <input type="hidden" name="_subject" value="New Quote Request — Jaynx Enterprises" />
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="hidden" name="_template" value="table" />
+            <input type="text" name="_honey" style="display:none" />
+
+            <div class="form-row">
+              <div class="field">
+                <label for="name">Full Name <span class="req" aria-label="required">*</span></label>
+                <input type="text" id="name" name="name" required placeholder="John Kamau" />
+              </div>
+              <div class="field">
+                <label for="company">Company / Organisation</label>
+                <input type="text" id="company" name="company" placeholder="ABC Millers Ltd" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label for="email">Email Address <span class="req" aria-label="required">*</span></label>
+                <input type="email" id="email" name="email" required placeholder="you@company.com" />
+              </div>
+              <div class="field">
+                <label for="phone">Phone / WhatsApp</label>
+                <input type="tel" id="phone" name="phone" placeholder="+254 7xx xxx xxx" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="product">Part / Product <span class="req" aria-label="required">*</span></label>
+              <input
+                type="text"
+                id="product"
+                name="product"
+                required
+                placeholder="e.g. Conveyor Belt 800mm EP200/3, SKF 6205 Bearing"
+              />
+            </div>
+
+            <div class="field">
+              <label for="message">Additional Details</label>
+              <textarea
+                id="message"
+                name="message"
+                rows="5"
+                placeholder="Machine model, quantity needed, urgency, or any other details that help us source the right part…"
+              ></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary submit-btn">
+              Send Quote Request
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <Footer />
+</Base>
+
+<script>
+  // Pre-fill product field from ?product= URL param
+  const url = new URL(window.location.href);
+  const productParam = url.searchParams.get('product');
+  if (productParam) {
+    const input = document.getElementById('product') as HTMLInputElement | null;
+    if (input) input.value = productParam;
+  }
+</script>
+
+<style>
+  .page-wrap { padding-top: 96px; padding-bottom: 80px; min-height: 100vh; }
+
+  .contact-layout {
+    display: grid;
+    grid-template-columns: 1fr 560px;
+    gap: 64px;
+    align-items: start;
+    padding: 52px 0 80px;
+  }
+
+  .contact-info .section-title { margin-bottom: 12px; }
+  .contact-info .section-sub { margin-bottom: 36px; }
+
+  .info-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .info-list li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .info-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+
+  .info-list strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--dark);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 2px;
+  }
+
+  .info-list a,
+  .info-list span {
+    font-size: 15px;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .info-list a { color: var(--accent); }
+  .info-list a:hover { color: var(--accent-dark); text-decoration: underline; }
+
+  /* Form card */
+  .form-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 36px;
+  }
+
+  .form-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--dark);
+    margin-bottom: 28px;
+  }
+
+  .quote-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+
+  .field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dark);
+    letter-spacing: 0.02em;
+  }
+
+  .req { color: var(--accent); }
+
+  .field input,
+  .field textarea {
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--dark);
+    background: #fafafa;
+    transition: border-color var(--transition), box-shadow var(--transition);
+    outline: none;
+    resize: vertical;
+  }
+
+  .field input::placeholder,
+  .field textarea::placeholder { color: #bbb; }
+
+  .field input:focus,
+  .field textarea:focus {
+    border-color: var(--accent);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  }
+
+  .submit-btn {
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 8px;
+    align-self: flex-start;
+  }
+
+  @media (max-width: 1000px) {
+    .contact-layout { grid-template-columns: 1fr; gap: 48px; }
+    .form-card { padding: 28px; }
+  }
+
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+    .form-card { padding: 20px; }
+    .submit-btn { width: 100%; justify-content: center; }
+  }
+</style>
