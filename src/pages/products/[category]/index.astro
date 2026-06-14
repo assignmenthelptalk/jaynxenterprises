@@ -4,6 +4,7 @@ import Navbar from '../../../components/Navbar.astro';
 import Footer from '../../../components/Footer.astro';
 import Breadcrumb from '../../../components/Breadcrumb.astro';
 import { categories, getProductsByCategory } from '../../../data/products';
+import { categorySEO } from '../../../data/seo';
 import type { Category } from '../../../data/products';
 
 export async function getStaticPaths() {
@@ -21,15 +22,62 @@ const { category } = Astro.props;
 const categoryProducts = getProductsByCategory(category.slug);
 const siteUrl = 'https://jaynxenterprises.co.ke';
 const ogImage = `${siteUrl}/categories/${category.slug}.webp`;
+const pageUrl = `${siteUrl}/products/${category.slug}`;
 
-const altText = `${category.name} supplier in Nairobi, Kenya — Jaynx Enterprises industrial machine spare parts East Africa`;
+const seo = categorySEO[category.slug];
+const pageTitle = seo?.title ?? `${category.name} — Industrial Spares Kenya | Jaynx Enterprises Nairobi`;
+const pageDesc  = seo?.description ?? `${category.description} Leading ${category.name.toLowerCase()} supplier in Nairobi, Kenya. Request a quote.`;
+const pageH1    = seo?.h1 ?? category.name;
+const intro     = seo?.intro ?? category.description;
+const faqs      = seo?.faqs ?? [];
+
+const altText = `${category.name} supplier in Nairobi Kenya — Jaynx Enterprises East Africa`;
+
+// JSON-LD schemas
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
+    { '@type': 'ListItem', position: 2, name: 'Products', item: `${siteUrl}/products` },
+    { '@type': 'ListItem', position: 3, name: category.name, item: pageUrl },
+  ],
+};
+
+const itemListSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: `${category.name} — Jaynx Enterprises Kenya`,
+  url: pageUrl,
+  numberOfItems: categoryProducts.length,
+  itemListElement: categoryProducts.slice(0, 10).map((p, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: p.name,
+    url: `${pageUrl}/${p.id}`,
+    description: p.description,
+  })),
+};
+
+const faqSchema = faqs.length > 0 ? {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map(f => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+} : null;
 ---
 
-<Base
-  title={`${category.name} — Industrial Spares Kenya | Jaynx Enterprises Nairobi`}
-  description={`${category.description} Leading ${category.name.toLowerCase()} supplier in Nairobi, Kenya. Fast sourcing across East Africa — request a quote today.`}
-  ogImage={ogImage}
->
+<Base title={pageTitle} description={pageDesc} ogImage={ogImage}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(itemListSchema)} />
+    {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
+  </Fragment>
+
   <Navbar />
 
   <div class="page-wrap">
@@ -53,12 +101,18 @@ const altText = `${category.name} supplier in Nairobi, Kenya — Jaynx Enterpris
         />
         <div class="cat-hero-overlay">
           <span class="cat-icon" aria-hidden="true">{category.icon}</span>
-          <h1 class="cat-hero-title">{category.name}</h1>
+          <h1 class="cat-hero-title">{pageH1}</h1>
           <p class="cat-hero-sub">{category.description}</p>
           <p class="part-count">{categoryProducts.length} part{categoryProducts.length !== 1 ? 's' : ''} available — Nairobi, Kenya</p>
         </div>
       </div>
 
+      <!-- Keyword-rich intro paragraph -->
+      {intro && (
+        <p class="cat-intro">{intro}</p>
+      )}
+
+      <!-- Products grid -->
       <div class="products-grid">
         {categoryProducts.map(product => {
           const specs = product.specifications ? Object.entries(product.specifications).slice(0, 3) : [];
@@ -78,10 +132,7 @@ const altText = `${category.name} supplier in Nairobi, Kenya — Jaynx Enterpris
                 )}
               </div>
               <div class="product-actions">
-                <a
-                  href={`/contact?product=${encodeURIComponent(product.name)}`}
-                  class="btn btn-primary btn-sm"
-                >
+                <a href={`/contact?product=${encodeURIComponent(product.name)}`} class="btn btn-primary btn-sm">
                   Get a Quote
                 </a>
                 <a href={`/products/${category.slug}/${product.id}`} class="btn btn-outline btn-sm">
@@ -93,13 +144,29 @@ const altText = `${category.name} supplier in Nairobi, Kenya — Jaynx Enterpris
         })}
       </div>
 
+      <!-- FAQ section -->
+      {faqs.length > 0 && (
+        <section class="faq-section" aria-labelledby="faq-heading">
+          <h2 class="faq-heading" id="faq-heading">Frequently Asked Questions</h2>
+          <div class="faq-list">
+            {faqs.map(item => (
+              <details class="faq-item">
+                <summary class="faq-q">{item.q}</summary>
+                <p class="faq-a">{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- CTA band -->
       <div class="cta-band">
         <div class="cta-band-inner">
           <div>
             <strong>Need a part not listed here?</strong>
-            <p>Share the part number or machine model and we'll source it.</p>
+            <p>Share the part number or machine model and we'll source it for you across Kenya.</p>
           </div>
-          <a href="/contact" class="btn btn-primary">Contact Us</a>
+          <a href="/contact" class="btn btn-primary">Request a Quote</a>
         </div>
       </div>
     </div>
@@ -109,54 +176,35 @@ const altText = `${category.name} supplier in Nairobi, Kenya — Jaynx Enterpris
 </Base>
 
 <style>
-  .page-wrap {
-    padding-top: 96px;
-    padding-bottom: 80px;
-    min-height: 100vh;
-  }
+  .page-wrap { padding-top: 96px; padding-bottom: 80px; min-height: 100vh; }
 
-  /* Hero image */
+  /* Hero */
   .cat-hero {
     position: relative;
     border-radius: 16px;
     overflow: hidden;
-    margin: 28px 0 44px;
+    margin: 28px 0 0;
     aspect-ratio: 16 / 7;
   }
 
-  .cat-hero-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+  .cat-hero-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
   .cat-hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      to right,
-      rgba(10, 20, 50, 0.80) 0%,
-      rgba(10, 20, 50, 0.55) 50%,
-      rgba(10, 20, 50, 0.10) 100%
-    );
+    background: linear-gradient(to right, rgba(10,20,50,0.82) 0%, rgba(10,20,50,0.52) 52%, rgba(10,20,50,0.08) 100%);
     display: flex;
     flex-direction: column;
     justify-content: center;
     padding: 36px 48px;
   }
 
-  .cat-icon {
-    font-size: 36px;
-    display: block;
-    margin-bottom: 10px;
-    line-height: 1;
-  }
+  .cat-icon { font-size: 34px; display: block; margin-bottom: 10px; line-height: 1; }
 
   .cat-hero-title {
-    font-size: clamp(26px, 3.5vw, 44px);
+    font-size: clamp(24px, 3.2vw, 42px);
     font-weight: 800;
-    color: #ffffff;
+    color: #fff;
     line-height: 1.1;
     letter-spacing: -0.02em;
     margin-bottom: 10px;
@@ -164,21 +212,35 @@ const altText = `${category.name} supplier in Nairobi, Kenya — Jaynx Enterpris
   }
 
   .cat-hero-sub {
-    font-size: 15px;
-    color: rgba(255,255,255,0.80);
+    font-size: 14.5px;
+    color: rgba(255,255,255,0.78);
     line-height: 1.65;
     max-width: 440px;
     margin-bottom: 14px;
   }
 
   .part-count {
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 700;
     color: #93c5fd;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
+  /* Intro */
+  .cat-intro {
+    font-size: 15px;
+    color: #444;
+    line-height: 1.75;
+    max-width: 860px;
+    margin: 28px 0 40px;
+    padding: 20px 24px;
+    background: #f7f9ff;
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+  }
+
+  /* Products grid */
   .products-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -198,7 +260,7 @@ const altText = `${category.name} supplier in Nairobi, Kenya — Jaynx Enterpris
 
   .product-card:hover {
     border-color: #c7d7fd;
-    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.08);
+    box-shadow: 0 4px 16px rgba(37,99,235,0.08);
   }
 
   .product-body { flex: 1; margin-bottom: 20px; }
@@ -210,48 +272,77 @@ const altText = `${category.name} supplier in Nairobi, Kenya — Jaynx Enterpris
     margin-bottom: 8px;
   }
 
-  .product-name a {
-    color: var(--dark);
-    text-decoration: none;
-    transition: color var(--transition);
-  }
+  .product-name a { color: var(--dark); text-decoration: none; transition: color var(--transition); }
+  .product-name a:hover { color: var(--accent); }
 
-  .product-name a:hover {
-    color: var(--accent);
-    text-decoration: none;
-  }
+  .product-desc { font-size: 13.5px; color: var(--muted); line-height: 1.65; margin-bottom: 14px; }
 
-  .product-desc {
-    font-size: 13.5px;
-    color: var(--muted);
-    line-height: 1.65;
-    margin-bottom: 14px;
-  }
-
-  .product-specs {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .product-specs li {
-    font-size: 12.5px;
-    color: #555;
-    line-height: 1.5;
-  }
-
-  .spec-key {
-    font-weight: 600;
-    color: var(--dark);
-  }
+  .product-specs { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+  .product-specs li { font-size: 12.5px; color: #555; line-height: 1.5; }
+  .spec-key { font-weight: 600; color: var(--dark); }
 
   .product-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-
   .btn-sm { padding: 9px 18px; font-size: 13px; }
 
+  /* FAQ */
+  .faq-section {
+    margin-bottom: 56px;
+    border-top: 1px solid var(--border);
+    padding-top: 48px;
+  }
+
+  .faq-heading {
+    font-size: clamp(20px, 2.5vw, 28px);
+    font-weight: 800;
+    color: var(--dark);
+    margin-bottom: 28px;
+  }
+
+  .faq-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .faq-item {
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .faq-q {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--dark);
+    padding: 18px 22px;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.15s;
+    font-family: var(--font-display);
+  }
+
+  .faq-q::-webkit-details-marker { display: none; }
+
+  .faq-q::after {
+    content: '+';
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--accent);
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+
+  .faq-item[open] .faq-q { background: #f7f9ff; }
+  .faq-item[open] .faq-q::after { transform: rotate(45deg); }
+
+  .faq-a {
+    font-size: 14.5px;
+    color: #555;
+    line-height: 1.72;
+    padding: 4px 22px 20px;
+  }
+
+  /* CTA band */
   .cta-band {
     background: #eef3ff;
     border: 1.5px solid #c7d7fd;
@@ -266,14 +357,7 @@ const altText = `${category.name} supplier in Nairobi, Kenya — Jaynx Enterpris
     gap: 24px;
   }
 
-  .cta-band strong {
-    display: block;
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--dark);
-    margin-bottom: 4px;
-  }
-
+  .cta-band strong { display: block; font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
   .cta-band p { font-size: 14px; color: var(--muted); margin: 0; }
   .cta-band .btn { flex-shrink: 0; }
 

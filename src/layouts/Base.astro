@@ -44,6 +44,41 @@ const normalizedOgImage = ogImage.startsWith('http') ? ogImage : `${siteUrl}${og
 
     <slot name="head" />
 
+    <!-- LocalBusiness structured data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "Jaynx Enterprises",
+        "description": "Nairobi-based industrial spare parts supplier serving Kenya and East Africa. Conveyor belts, bearings, valves, motors, filters and more.",
+        "url": "https://jaynxenterprises.co.ke",
+        "telephone": "+254705954325",
+        "email": "info@jaynxenterprises.co.ke",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Industrial Area",
+          "addressLocality": "Nairobi",
+          "addressCountry": "KE"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": -1.2921,
+          "longitude": 36.8219
+        },
+        "areaServed": ["Kenya", "Uganda", "Tanzania", "Rwanda", "Ethiopia", "East Africa"],
+        "priceRange": "$$",
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+          "opens": "08:00",
+          "closes": "17:00"
+        },
+        "sameAs": [
+          "https://wa.me/254705954325"
+        ]
+      }
+    </script>
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
