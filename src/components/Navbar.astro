@@ -1,5 +1,6 @@
----
+﻿---
 import { SITE } from '../config';
+import { categories } from '../data/products';
 ---
 
 <div class="nav-overlay" id="nav-overlay" aria-hidden="true"></div>
@@ -11,7 +12,52 @@ import { SITE } from '../config';
     </a>
 
     <nav class="nav-links" id="nav-links">
-      <a href="/products" class="menu-link">Products</a>
+      <!-- Products dropdown -->
+      <div class="nav-dropdown" id="products-dropdown">
+        <button
+          class="menu-link dropdown-trigger"
+          id="products-btn"
+          aria-expanded="false"
+          aria-haspopup="true"
+        >
+          Products
+          <svg class="chevron" viewBox="0 0 12 8" fill="none" width="10" height="10" aria-hidden="true">
+            <path d="M1 1.5l5 5 5-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <div class="dropdown-panel" id="products-panel" role="menu" aria-labelledby="products-btn">
+          <div class="dropdown-header">
+            <span class="dropdown-heading">Product Categories</span>
+            <a href="/products" class="dropdown-all">View all →</a>
+          </div>
+          <div class="dropdown-grid">
+            {categories.map(cat => (
+              <a href={`/products/${cat.slug}`} class="dropdown-item" role="menuitem">
+                <span class="dropdown-icon" aria-hidden="true">{cat.icon}</span>
+                <span class="dropdown-name">{cat.name}</span>
+              </a>
+            ))}
+          </div>
+          <div class="dropdown-footer">
+            <a href="/contact" class="dropdown-quote-link">
+              Can't find a part? Request a quote →
+            </a>
+          </div>
+        </div>
+
+        <!-- Mobile sub-list (expanded inline) -->
+        <div class="mobile-cat-list" id="mobile-cat-list" hidden>
+          {categories.map(cat => (
+            <a href={`/products/${cat.slug}`} class="mobile-cat-link">
+              <span aria-hidden="true">{cat.icon}</span>
+              {cat.name}
+            </a>
+          ))}
+          <a href="/products" class="mobile-cat-link mobile-cat-all">Browse all categories →</a>
+        </div>
+      </div>
+
       <a href="/#services" class="menu-link">Services</a>
       <a href="/#industries" class="menu-link">Industries</a>
       <a href="/#contact" class="menu-link">Contact</a>
@@ -43,11 +89,56 @@ import { SITE } from '../config';
 </header>
 
 <script>
-  const navbar   = document.getElementById('navbar');
-  const toggle   = document.getElementById('mobile-toggle');
-  const navLinks = document.getElementById('nav-links');
-  const overlay  = document.getElementById('nav-overlay');
+  const navbar    = document.getElementById('navbar');
+  const toggle    = document.getElementById('mobile-toggle');
+  const navLinks  = document.getElementById('nav-links');
+  const overlay   = document.getElementById('nav-overlay');
+  const prodBtn   = document.getElementById('products-btn');
+  const prodPanel = document.getElementById('products-panel');
+  const mobileCat = document.getElementById('mobile-cat-list');
+  const prodDrop  = document.getElementById('products-dropdown');
 
+  // ── Desktop dropdown (hover + keyboard) ──────────────────────
+  let closeTimer: ReturnType<typeof setTimeout>;
+
+  function openDropdown() {
+    clearTimeout(closeTimer);
+    prodPanel?.removeAttribute('hidden');
+    prodBtn?.setAttribute('aria-expanded', 'true');
+    prodDrop?.classList.add('open');
+  }
+
+  function closeDropdown() {
+    closeTimer = setTimeout(() => {
+      prodPanel?.setAttribute('hidden', '');
+      prodBtn?.setAttribute('aria-expanded', 'false');
+      prodDrop?.classList.remove('open');
+    }, 120);
+  }
+
+  prodDrop?.addEventListener('mouseenter', openDropdown);
+  prodDrop?.addEventListener('mouseleave', closeDropdown);
+  prodPanel?.addEventListener('mouseenter', () => clearTimeout(closeTimer));
+  prodPanel?.addEventListener('mouseleave', closeDropdown);
+
+  prodBtn?.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      prodPanel?.hasAttribute('hidden') ? openDropdown() : closeDropdown();
+    }
+    if (e.key === 'Escape') closeDropdown();
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!prodDrop?.contains(e.target as Node)) closeDropdown();
+  });
+
+  // Close on item click (desktop)
+  prodPanel?.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', closeDropdown);
+  });
+
+  // ── Mobile toggle ──────────────────────────────────────────────
   function openMenu() {
     navLinks?.classList.add('open');
     toggle?.classList.add('open');
@@ -60,7 +151,27 @@ import { SITE } from '../config';
     toggle?.classList.remove('open');
     overlay?.classList.remove('open');
     document.body.style.overflow = '';
+    // collapse mobile categories too
+    mobileCat?.setAttribute('hidden', '');
+    prodBtn?.setAttribute('aria-expanded', 'false');
+    prodDrop?.classList.remove('mobile-open');
   }
+
+  // Mobile Products button toggles sub-list instead of navigating
+  prodBtn?.addEventListener('click', () => {
+    const isMobile = window.innerWidth <= 768;
+    if (!isMobile) return;
+    const isOpen = !mobileCat?.hasAttribute('hidden');
+    if (isOpen) {
+      mobileCat?.setAttribute('hidden', '');
+      prodBtn.setAttribute('aria-expanded', 'false');
+      prodDrop?.classList.remove('mobile-open');
+    } else {
+      mobileCat?.removeAttribute('hidden');
+      prodBtn.setAttribute('aria-expanded', 'true');
+      prodDrop?.classList.add('mobile-open');
+    }
+  });
 
   window.addEventListener('scroll', () => {
     navbar?.classList.toggle('scrolled', window.scrollY > 60);
@@ -72,17 +183,24 @@ import { SITE } from '../config';
 
   overlay?.addEventListener('click', closeMenu);
 
-  navLinks?.querySelectorAll('a').forEach(link => {
+  // Close menu on non-dropdown link click
+  navLinks?.querySelectorAll('a:not(.dropdown-item):not(.mobile-cat-link)').forEach(link => {
     link.addEventListener('click', closeMenu);
   });
+
+  // Close menu when a mobile category link is clicked
+  mobileCat?.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', closeMenu);
+  });
+
+  // Hide panel on page load (it's visible in SSR)
+  prodPanel?.setAttribute('hidden', '');
 </script>
 
 <style>
   .navbar {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 0; left: 0; right: 0;
     z-index: 100;
     background: #ffffff;
     border-bottom: 1px solid #ebebeb;
@@ -92,7 +210,6 @@ import { SITE } from '../config';
   .navbar-inner {
     display: flex;
     align-items: center;
-    gap: 0;
     height: 72px;
   }
 
@@ -106,13 +223,12 @@ import { SITE } from '../config';
     color: #111111;
     letter-spacing: -0.01em;
     flex-shrink: 0;
-    margin-right: 40px;
+    margin-right: 32px;
     text-decoration: none;
   }
 
   .logo-icon {
-    width: 32px;
-    height: 32px;
+    width: 32px; height: 32px;
     background: #2563eb;
     color: #ffffff;
     border-radius: 8px;
@@ -127,24 +243,132 @@ import { SITE } from '../config';
   .nav-links {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
   }
 
-  .nav-links a {
+  .menu-link {
     font-size: 14px;
     font-weight: 500;
     color: #2563eb;
     padding: 6px 12px;
     border-radius: 6px;
     text-decoration: none;
-    transition: color 0.15s ease, background 0.15s ease;
+    transition: color 0.15s, background 0.15s;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
   }
 
-  .nav-links a:hover {
-    color: #1d4ed8;
-    background: #f4f4f5;
+  .menu-link:hover { color: #1d4ed8; background: #f4f4f5; }
+
+  .chevron {
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
   }
 
+  /* ── Desktop dropdown ────────────────────────────────────── */
+  .nav-dropdown { position: relative; }
+
+  .dropdown-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 560px;
+    background: #ffffff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 14px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    padding: 0;
+    z-index: 200;
+    animation: dropIn 0.15s ease;
+    overflow: hidden;
+  }
+
+  @keyframes dropIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
+  .nav-dropdown.open .chevron { transform: rotate(180deg); }
+
+  .dropdown-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .dropdown-heading {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #888;
+  }
+
+  .dropdown-all {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .dropdown-all:hover { text-decoration: underline; }
+
+  .dropdown-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    padding: 10px;
+  }
+
+  .dropdown-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 8px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--dark);
+    text-align: center;
+    transition: background 0.15s;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .dropdown-item:hover { background: #f4f7ff; color: var(--accent); }
+
+  .dropdown-icon { font-size: 22px; line-height: 1; }
+
+  .dropdown-name { font-size: 11.5px; }
+
+  .dropdown-footer {
+    padding: 10px 18px 12px;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .dropdown-quote-link {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .dropdown-quote-link:hover { color: var(--accent); }
+
+  /* Mobile sub-list hidden on desktop */
+  .mobile-cat-list { display: none; }
+
+  /* ── Right-side elements ──────────────────────────────────── */
   .nav-whatsapp {
     display: flex;
     align-items: center;
@@ -160,19 +384,17 @@ import { SITE } from '../config';
     text-decoration: none;
     white-space: nowrap;
     flex-shrink: 0;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition: background 0.15s, color 0.15s;
   }
 
-  .nav-whatsapp:hover {
-    background: #dcfce7;
-    color: #15803d;
-  }
+  .nav-whatsapp:hover { background: #dcfce7; color: #15803d; }
 
   .nav-cta {
     padding: 10px 20px;
     font-size: 14px;
     flex-shrink: 0;
     border-radius: 6px;
+    margin-left: 10px;
   }
 
   .mobile-toggle {
@@ -184,17 +406,6 @@ import { SITE } from '../config';
     cursor: pointer;
     padding: 4px;
     margin-left: auto;
-  }
-
-  .nav-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 98;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
   }
 
   .mobile-toggle span {
@@ -209,17 +420,23 @@ import { SITE } from '../config';
   .mobile-toggle.open span:nth-child(2) { opacity: 0; }
   .mobile-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
+  .nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 98;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  /* ── Mobile ────────────────────────────────────────────────── */
   @media (max-width: 768px) {
     .navbar-inner { gap: 10px; }
 
-    .mobile-toggle {
-      display: flex;
-      order: 3;
-      margin-left: 0;
-      flex-shrink: 0;
-    }
-
-    .nav-whatsapp { display: none; }
+    .mobile-toggle { display: flex; order: 3; margin-left: 0; flex-shrink: 0; }
+    .nav-whatsapp  { display: none; }
 
     .nav-cta {
       order: 2;
@@ -239,20 +456,13 @@ import { SITE } from '../config';
       flex: 1 1 auto;
     }
 
-    .logo-icon {
-      width: 30px;
-      height: 30px;
-      font-size: 14px;
-    }
-
+    .logo-icon { width: 30px; height: 30px; font-size: 14px; }
     .logo, .logo span { white-space: nowrap; }
 
     .nav-links {
       position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      width: min(280px, 80vw);
+      top: 0; right: 0; bottom: 0;
+      width: min(300px, 80vw);
       flex-direction: column;
       align-items: flex-start;
       gap: 0;
@@ -260,17 +470,32 @@ import { SITE } from '../config';
       padding: 88px 0 32px;
       margin: 0;
       transform: translateX(100%);
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: -8px 0 32px rgba(0,0,0,0.4);
       z-index: 99;
+      overflow-y: auto;
     }
 
-    .nav-links.open {
-      display: flex;
-      transform: translateX(0);
+    .nav-links.open { display: flex; transform: translateX(0); }
+
+    /* Desktop dropdown panel hidden on mobile */
+    .dropdown-panel { display: none !important; }
+
+    /* Mobile trigger looks like a full-width link */
+    .dropdown-trigger {
+      width: 100%;
+      padding: 16px 28px;
+      font-size: 17px;
+      border-radius: 0;
+      border-bottom: 1px solid #f0f0f0;
+      color: #2563eb;
+      justify-content: space-between;
     }
 
-    .nav-links a {
+    .nav-dropdown.mobile-open .chevron { transform: rotate(180deg); }
+
+    /* Other nav links */
+    .nav-links > a.menu-link {
       width: 100%;
       padding: 16px 28px;
       font-size: 17px;
@@ -278,6 +503,31 @@ import { SITE } from '../config';
       border-bottom: 1px solid #f0f0f0;
       color: #2563eb;
     }
+
+    /* Mobile sub-list */
+    .mobile-cat-list {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      background: #f7f9ff;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .mobile-cat-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 28px 12px 36px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--dark);
+      text-decoration: none;
+      border-bottom: 1px solid #eef0f4;
+      transition: background 0.12s, color 0.12s;
+    }
+
+    .mobile-cat-link:hover { background: #eef3ff; color: var(--accent); }
+    .mobile-cat-all { font-weight: 700; color: var(--accent); border-bottom: none; padding-top: 14px; padding-bottom: 14px; }
 
     .nav-overlay { display: block; }
     .nav-overlay.open { opacity: 1; pointer-events: auto; }
