@@ -1,4 +1,4 @@
----
+﻿---
 import Base from '../../../layouts/Base.astro';
 import Navbar from '../../../components/Navbar.astro';
 import Footer from '../../../components/Footer.astro';
@@ -19,11 +19,16 @@ interface Props {
 
 const { category } = Astro.props;
 const categoryProducts = getProductsByCategory(category.slug);
+const siteUrl = 'https://jaynxenterprises.co.ke';
+const ogImage = `${siteUrl}/categories/${category.slug}.webp`;
+
+const altText = `${category.name} supplier in Nairobi, Kenya — Jaynx Enterprises industrial machine spare parts East Africa`;
 ---
 
 <Base
-  title={`${category.name} — Industrial Spares | Jaynx Enterprises`}
-  description={`${category.description} Request a quote on any part — no prices, just fast sourcing.`}
+  title={`${category.name} — Industrial Spares Kenya | Jaynx Enterprises Nairobi`}
+  description={`${category.description} Leading ${category.name.toLowerCase()} supplier in Nairobi, Kenya. Fast sourcing across East Africa — request a quote today.`}
+  ogImage={ogImage}
 >
   <Navbar />
 
@@ -35,12 +40,24 @@ const categoryProducts = getProductsByCategory(category.slug);
         { label: category.name },
       ]} />
 
-      <header class="page-header">
-        <span class="cat-icon" aria-hidden="true">{category.icon}</span>
-        <h1 class="section-title">{category.name}</h1>
-        <p class="section-sub">{category.description}</p>
-        <p class="part-count">{categoryProducts.length} part{categoryProducts.length !== 1 ? 's' : ''} available</p>
-      </header>
+      <!-- Category hero image -->
+      <div class="cat-hero">
+        <img
+          src={`/categories/${category.slug}.webp`}
+          alt={altText}
+          width="1376"
+          height="745"
+          loading="eager"
+          fetchpriority="high"
+          class="cat-hero-img"
+        />
+        <div class="cat-hero-overlay">
+          <span class="cat-icon" aria-hidden="true">{category.icon}</span>
+          <h1 class="cat-hero-title">{category.name}</h1>
+          <p class="cat-hero-sub">{category.description}</p>
+          <p class="part-count">{categoryProducts.length} part{categoryProducts.length !== 1 ? 's' : ''} available — Nairobi, Kenya</p>
+        </div>
+      </div>
 
       <div class="products-grid">
         {categoryProducts.map(product => {
@@ -98,22 +115,66 @@ const categoryProducts = getProductsByCategory(category.slug);
     min-height: 100vh;
   }
 
-  .page-header { padding: 36px 0 44px; }
+  /* Hero image */
+  .cat-hero {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    margin: 28px 0 44px;
+    aspect-ratio: 16 / 7;
+  }
+
+  .cat-hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .cat-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to right,
+      rgba(10, 20, 50, 0.80) 0%,
+      rgba(10, 20, 50, 0.55) 50%,
+      rgba(10, 20, 50, 0.10) 100%
+    );
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 36px 48px;
+  }
 
   .cat-icon {
     font-size: 36px;
     display: block;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     line-height: 1;
   }
 
-  .page-header h1 { margin-bottom: 10px; }
+  .cat-hero-title {
+    font-size: clamp(26px, 3.5vw, 44px);
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+    max-width: 560px;
+  }
+
+  .cat-hero-sub {
+    font-size: 15px;
+    color: rgba(255,255,255,0.80);
+    line-height: 1.65;
+    max-width: 440px;
+    margin-bottom: 14px;
+  }
 
   .part-count {
-    margin-top: 12px;
     font-size: 12px;
-    font-weight: 600;
-    color: var(--accent);
+    font-weight: 700;
+    color: #93c5fd;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
@@ -218,6 +279,7 @@ const categoryProducts = getProductsByCategory(category.slug);
 
   @media (max-width: 900px) {
     .products-grid { grid-template-columns: repeat(2, 1fr); }
+    .cat-hero-overlay { padding: 28px 32px; }
   }
 
   @media (max-width: 600px) {
@@ -225,5 +287,8 @@ const categoryProducts = getProductsByCategory(category.slug);
     .product-card { padding: 18px; }
     .cta-band-inner { flex-direction: column; align-items: flex-start; }
     .cta-band { padding: 20px; }
+    .cat-hero { aspect-ratio: 4 / 3; }
+    .cat-hero-overlay { padding: 20px 22px; }
+    .cat-hero-sub { display: none; }
   }
 </style>
