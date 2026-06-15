@@ -3,45 +3,73 @@ import Base from '../layouts/Base.astro';
 import Navbar from '../components/Navbar.astro';
 import Hero from '../components/Hero.astro';
 import Stats from '../components/Stats.astro';
-import CatalogSection from '../components/CatalogSection.astro';
+import Services from '../components/Services.astro';
 import QuoteForm from '../components/QuoteForm.astro';
 import Footer from '../components/Footer.astro';
 import { SITE } from '../config';
-import { categories, getProductsByCategory } from '../data/products';
+import { categories } from '../data/products';
+
+const featuredCategories = categories;
 ---
 
 <Base>
   <Navbar />
   <Hero />
   <Stats />
+  <Services />
+  <!-- ── Products Section ──────────────────────────────────────── -->
+  <section class="home-products section" id="products">
+    <div class="container">
+      <div class="hp-header">
+        <div>
+          <span class="section-label">Product Catalogue</span>
+          <h2 class="section-title">Industrial Spares — 16 Categories</h2>
+          <p class="section-sub">Over 100 parts for food processing, manufacturing, and industrial machinery. No prices on the site — request a quote on any part.</p>
+        </div>
+        <a href="/products" class="btn btn-outline hp-all-link">Browse All Categories →</a>
+      </div>
 
-  <!-- ── Category quick-nav strip ──────────────────────────────── -->
-  <div class="cat-nav-wrap">
-    <div class="cat-nav-inner">
-      {categories.map(cat => (
-        <a href={`#${cat.slug}`} class="cat-nav-pill">
-          <span class="cnp-icon" aria-hidden="true">{cat.icon}</span>
-          <span class="cnp-label">{cat.name.replace(/ &.*$/, '').replace(/ (Parts|Components|Supplies|System|Systems).*$/, '')}</span>
-        </a>
-      ))}
+      <div class="hp-grid">
+        {featuredCategories.map(cat => (
+          <a href={`/products/${cat.slug}`} class="hp-card">
+            <span class="hp-icon" aria-hidden="true">{cat.icon}</span>
+            <span class="hp-name">{cat.name}</span>
+          </a>
+        ))}
+      </div>
+
+      <div class="hp-cta">
+        <p>Looking for a specific part? <a href="/contact">Send us the part number →</a></p>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- ── Product Catalog ───────────────────────────────────────── -->
-  <div class="catalog-wrap" id="products">
-    <div class="container catalog-intro">
-      <span class="section-label">Product Catalogue</span>
-      <h2 class="section-title">Browse Our Industrial Spares</h2>
-      <p class="section-sub">1,000+ parts across 16 categories. No prices on site — request a quote on any item and we'll respond within 24 hours.</p>
+  <!-- ── Why Choose Us ──────────────────────────────────────────── -->
+  <section class="why-us section">
+    <div class="container">
+      <div class="why-header">
+        <span class="section-label">Why Jaynx?</span>
+        <h2 class="section-title">Built for East Africa's Industry</h2>
+      </div>
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="why-icon" aria-hidden="true">🏭</span>
+          <h3>Wide Range</h3>
+          <p>100+ spare parts spanning conveyor systems, bearings, compressors, motors, boilers, and more — sourced from trusted global manufacturers.</p>
+        </div>
+        <div class="why-card">
+          <span class="why-icon" aria-hidden="true">⚡</span>
+          <h3>Fast Sourcing</h3>
+          <p>Send us a part number or machine model. We respond within 24 hours with availability, lead time, and a competitive price — no long procurement chains.</p>
+        </div>
+        <div class="why-card">
+          <span class="why-icon" aria-hidden="true">✅</span>
+          <h3>Quality Assured</h3>
+          <p>Every part is verified against the original specification before dispatch. We stock OEM and premium-grade equivalents — nothing substandard leaves our warehouse.</p>
+        </div>
+      </div>
     </div>
-
-    {categories.map(cat => (
-      <CatalogSection
-        category={cat}
-        products={getProductsByCategory(cat.slug)}
-      />
-    ))}
-  </div>
+  </section>
 
   <!-- ── CTA Banner ─────────────────────────────────────────────── -->
   <div class="cta-banner">
@@ -102,74 +130,45 @@ import { categories, getProductsByCategory } from '../data/products';
 </Base>
 
 <style>
-  /* ── Category quick-nav ─────────────────────────────────────── */
-  .cat-nav-wrap {
-    background: #fff;
-    border-top: 1px solid #e8e8e8;
-    border-bottom: 1px solid #e8e8e8;
-    position: sticky;
-    top: 72px;
-    z-index: 50;
-  }
+  /* Products section */
+  .home-products { background: #f7f9ff; }
+  .hp-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 36px; flex-wrap: wrap; }
+  .hp-all-link { flex-shrink: 0; }
+  .hp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+  .hp-card { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 22px 16px; background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-lg); text-decoration: none; color: inherit; text-align: center; transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition); }
+  .hp-card:hover { border-color: var(--accent); box-shadow: 0 4px 16px rgba(37,99,235,0.1); transform: translateY(-2px); text-decoration: none; }
+  .hp-icon { font-size: 28px; line-height: 1; }
+  .hp-name { font-size: 13px; font-weight: 700; color: var(--dark); line-height: 1.3; }
+  .hp-cta { text-align: center; font-size: 14px; color: var(--muted); }
+  .hp-cta a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .hp-cta a:hover { text-decoration: underline; }
 
-  .cat-nav-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 24px;
-    display: flex;
-    gap: 4px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    -webkit-overflow-scrolling: touch;
-  }
+  /* Why Us section */
+  .why-header { text-align: center; margin-bottom: 40px; }
+  .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .why-card { padding: 28px; background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-lg); }
+  .why-icon { display: block; font-size: 30px; margin-bottom: 14px; }
+  .why-card h3 { font-size: 17px; font-weight: 800; color: var(--dark); margin-bottom: 10px; }
+  .why-card p { font-size: 14px; color: var(--muted); line-height: 1.7; margin: 0; }
 
-  .cat-nav-inner::-webkit-scrollbar { display: none; }
-
-  .cat-nav-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 10px 14px;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: #444;
-    text-decoration: none;
-    white-space: nowrap;
-    flex-shrink: 0;
-    border-bottom: 2px solid transparent;
-    transition: color 0.15s, border-color 0.15s;
-  }
-
-  .cat-nav-pill:hover {
-    color: #2563eb;
-    border-bottom-color: #2563eb;
-  }
-
-  .cnp-icon { font-size: 15px; line-height: 1; }
-  .cnp-label { line-height: 1; }
-
-  /* ── Catalog ────────────────────────────────────────────────── */
-  .catalog-wrap {
-    background: #f7f9ff;
-  }
-
-  .catalog-intro {
-    padding-top: 52px;
-    padding-bottom: 8px;
-    text-align: center;
-  }
-
-  /* ── CTA Banner ─────────────────────────────────────────────── */
-  .cta-banner { background: #111; padding: 52px 0; }
+  /* CTA Banner */
+  .cta-banner { background: var(--dark); padding: 52px 0; }
   .cta-banner-inner { display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
-  .cta-banner-text h2 { font-size: clamp(20px, 2.5vw, 28px); color: #fff; margin-bottom: 8px; }
+  .cta-banner-text h2 { font-size: clamp(20px, 2.5vw, 28px); color: #ffffff; margin-bottom: 8px; }
   .cta-banner-text p { font-size: 15px; color: rgba(255,255,255,0.7); margin: 0; max-width: 520px; }
   .cta-banner-actions { display: flex; gap: 12px; flex-wrap: wrap; flex-shrink: 0; }
-  .btn-outline--white { border-color: rgba(255,255,255,0.4); color: #fff; }
+  .btn-outline--white { border-color: rgba(255,255,255,0.4); color: #ffffff; }
   .btn-outline--white:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.7); }
 
-  /* ── WhatsApp float ─────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .why-grid { grid-template-columns: 1fr; gap: 16px; }
+    .cta-banner-inner { flex-direction: column; align-items: flex-start; }
+  }
+  @media (max-width: 700px) {
+    .hp-grid { grid-template-columns: repeat(2, 1fr); }
+    .hp-header { flex-direction: column; align-items: flex-start; }
+  }
+
   .wa-float {
     position: fixed;
     bottom: 104px;
@@ -178,42 +177,40 @@ import { categories, getProductsByCategory } from '../data/products';
     width: 56px;
     height: 56px;
     background: #25D366;
-    color: #fff;
+    color: #ffffff;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 20px rgba(37,211,102,0.4);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+    transition: transform var(--transition), box-shadow var(--transition);
     text-decoration: none;
   }
 
   .wa-float:hover {
     transform: scale(1.08);
-    box-shadow: 0 6px 28px rgba(37,211,102,0.5);
+    box-shadow: 0 6px 28px rgba(37, 211, 102, 0.5);
   }
 
-  /* ── Mobile sticky CTA ──────────────────────────────────────── */
   .mobile-sticky-cta { display: none; }
-
-  @media (max-width: 900px) {
-    .cta-banner-inner { flex-direction: column; align-items: flex-start; }
-  }
 
   @media (max-width: 768px) {
     body { padding-bottom: 112px; }
+
     .wa-float { display: none; }
 
     .mobile-sticky-cta {
       position: fixed;
-      left: 0; right: 0; bottom: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       z-index: 110;
       display: grid;
       grid-template-columns: 1fr 1.15fr;
       gap: 14px;
       padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
       background: #10233f;
-      box-shadow: 0 -10px 24px rgba(16,35,63,0.22);
+      box-shadow: 0 -10px 24px rgba(16, 35, 63, 0.22);
     }
 
     .mobile-sticky-btn {
@@ -226,14 +223,14 @@ import { categories, getProductsByCategory } from '../data/products';
       font-size: 17px;
       font-weight: 800;
       text-decoration: none;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
     }
 
     .mobile-sticky-cta a.mobile-sticky-btn--quote,
     .mobile-sticky-cta a.mobile-sticky-btn--quote:link,
     .mobile-sticky-cta a.mobile-sticky-btn--quote:visited {
       background: #2563eb;
-      color: #fff !important;
+      color: #ffffff !important;
       text-decoration: none !important;
     }
 
@@ -241,10 +238,8 @@ import { categories, getProductsByCategory } from '../data/products';
     .mobile-sticky-cta a.mobile-sticky-btn--whatsapp:link,
     .mobile-sticky-cta a.mobile-sticky-btn--whatsapp:visited {
       background: #29d365;
-      color: #fff !important;
+      color: #ffffff !important;
       text-decoration: none !important;
     }
-
-    .cat-nav-wrap { top: 60px; }
   }
 </style>
