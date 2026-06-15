@@ -3,6 +3,7 @@ export interface Product {
   name: string;
   category: string;
   description: string;
+  image?: string;
   specifications?: Record<string, string>;
   tags?: string[];
 }
