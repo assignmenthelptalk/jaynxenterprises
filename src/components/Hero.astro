@@ -33,37 +33,56 @@ import { SITE } from '../config';
     </div>
 
     <div class="hero-right">
-      <div class="showcase-card">
-        <p class="showcase-label">What we supply</p>
-        <div class="showcase-grid">
-          <a href="/products/fasteners-hardware" class="showcase-item">
-            <span class="showcase-icon">🔧</span>
-            <span class="showcase-name">Industrial Tools</span>
-          </a>
-          <a href="/products/piping-valves" class="showcase-item">
-            <span class="showcase-icon">🔩</span>
-            <span class="showcase-name">Pipe Fittings</span>
-          </a>
-          <a href="/products/electrical-motors" class="showcase-item">
-            <span class="showcase-icon">⚙️</span>
-            <span class="showcase-name">Pumps & Motors</span>
-          </a>
-          <a href="/products/air-pneumatic" class="showcase-item">
-            <span class="showcase-icon">🌀</span>
-            <span class="showcase-name">Hoses & Couplings</span>
-          </a>
-          <a href="/products/boiler-steam" class="showcase-item">
-            <span class="showcase-icon">🔑</span>
-            <span class="showcase-name">Valves & Actuators</span>
-          </a>
-          <a href="/products/crusher-processing" class="showcase-item">
-            <span class="showcase-icon">🏗️</span>
-            <span class="showcase-name">Fabrication</span>
-          </a>
+      <div class="hero-visual">
+        <!-- decorative blob -->
+        <div class="visual-blob"></div>
+
+        <!-- main product image -->
+        <div class="visual-main">
+          <img
+            src="/categories/electrical-motors.webp"
+            alt="Industrial motors and electrical equipment"
+            loading="eager"
+            width="300"
+            height="380"
+          />
         </div>
-        <div class="showcase-footer">
-          <span class="showcase-badge">1,000+ products in stock</span>
-          <span class="showcase-badge">Same-day despatch</span>
+
+        <!-- floating left card -->
+        <div class="visual-float visual-float-left">
+          <div class="float-icon">
+            <img src="/categories/piping-valves.webp" alt="" />
+          </div>
+          <span>Piping &amp; Valves</span>
+        </div>
+
+        <!-- floating right card -->
+        <div class="visual-float visual-float-right">
+          <div class="float-icon">
+            <img src="/categories/bearings.webp" alt="" />
+          </div>
+          <span>Bearings</span>
+        </div>
+
+        <!-- trust pill -->
+        <div class="visual-pill">
+          <div class="pill-thumbs">
+            <img src="/categories/fasteners-hardware.webp" alt="" />
+            <img src="/categories/compressor-parts.webp" alt="" />
+            <img src="/categories/conveyor-belts.webp" alt="" />
+          </div>
+          <div class="pill-copy">
+            <strong>500+ businesses</strong>
+            <span>served across Kenya</span>
+          </div>
+        </div>
+
+        <!-- mini product icon grid -->
+        <div class="visual-mini-grid">
+          <img src="/categories/seals-gaskets.webp" alt="" />
+          <img src="/categories/v-belts.webp" alt="" />
+          <img src="/categories/lubricants.webp" alt="" />
+          <img src="/categories/sensors-controls.webp" alt="" />
         </div>
       </div>
     </div>
@@ -96,23 +115,9 @@ import { SITE } from '../config';
     pointer-events: none;
   }
 
-  .hero::after {
-    content: '';
-    position: absolute;
-    right: -2%;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 52%;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: radial-gradient(circle, #c7d3f8 0%, #b8c8f5 40%, transparent 70%);
-    opacity: 0.55;
-    pointer-events: none;
-  }
-
   .hero-inner {
     display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
+    grid-template-columns: 1.1fr 0.9fr;
     gap: 48px;
     align-items: center;
     width: 100%;
@@ -120,6 +125,7 @@ import { SITE } from '../config';
     z-index: 1;
   }
 
+  /* ── Left side ── */
   .hero-left {
     display: flex;
     flex-direction: column;
@@ -206,77 +212,209 @@ import { SITE } from '../config';
     transform: translateY(-2px);
   }
 
-  /* Showcase card */
-  .showcase-card {
-    background: #ffffff;
-    border: 1.5px solid #e2e8f6;
-    border-radius: 20px;
-    padding: 32px 28px 28px;
-    box-shadow: 0 20px 56px rgba(37, 99, 235, 0.12);
-    position: relative;
-    z-index: 1;
-  }
-
-  .showcase-label {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #2563eb;
-    margin-bottom: 20px;
-  }
-
-  .showcase-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-
-  .showcase-item {
+  /* ── Right side: image composition ── */
+  .hero-right {
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: #f4f7ff;
-    border: 1px solid #e2e8f6;
-    border-radius: 10px;
-    padding: 12px 14px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    text-decoration: none;
-    color: inherit;
+    justify-content: center;
   }
 
-  .showcase-item:hover {
-    border-color: #2563eb;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
-  }
-
-  .showcase-icon {
-    font-size: 20px;
+  .hero-visual {
+    position: relative;
+    width: 380px;
+    height: 468px;
     flex-shrink: 0;
   }
 
-  .showcase-name {
-    font-size: 13px;
-    font-weight: 600;
+  /* decorative blue circle blob */
+  .visual-blob {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -54%);
+    width: 70%;
+    aspect-ratio: 1;
+    background: #4361ee;
+    border-radius: 50%;
+    opacity: 0.25;
+    z-index: 0;
+  }
+
+  /* main tall product image */
+  .visual-main {
+    position: absolute;
+    top: 4%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 64%;
+    height: 78%;
+    border-radius: 24px;
+    overflow: hidden;
+    z-index: 1;
+    box-shadow:
+      0 28px 60px rgba(37, 99, 235, 0.22),
+      0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .visual-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  /* floating glass cards */
+  .visual-float {
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 10px 10px 8px;
+    box-shadow:
+      0 10px 30px rgba(37, 99, 235, 0.14),
+      0 2px 6px rgba(0, 0, 0, 0.06);
+    animation: float-y 3s ease-in-out infinite;
+  }
+
+  .visual-float-left {
+    left: -6px;
+    top: 28%;
+    animation-delay: 0s;
+  }
+
+  .visual-float-right {
+    right: -6px;
+    top: 20%;
+    animation-delay: 1.5s;
+  }
+
+  .float-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 15px;
+    overflow: hidden;
+    background: #f0f4ff;
+    box-shadow: 0 2px 8px rgba(67, 97, 238, 0.18);
+  }
+
+  .float-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .visual-float span {
+    font-size: 10px;
+    font-weight: 700;
     color: #0e1f3d;
+    text-align: center;
+    line-height: 1.25;
+    max-width: 72px;
+  }
+
+  /* trust / stats pill */
+  .visual-pill {
+    position: absolute;
+    bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    border-radius: 999px;
+    padding: 8px 16px 8px 8px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.11);
+    white-space: nowrap;
+  }
+
+  .pill-thumbs {
+    display: flex;
+    align-items: center;
+  }
+
+  .pill-thumbs img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    object-fit: cover;
+    display: block;
+    margin-left: -8px;
+  }
+
+  .pill-thumbs img:first-child {
+    margin-left: 0;
+  }
+
+  .pill-copy {
+    display: flex;
+    flex-direction: column;
     line-height: 1.3;
   }
 
-  .showcase-footer {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+  .pill-copy strong {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0e1f3d;
   }
 
-  .showcase-badge {
-    background: #eef3ff;
-    color: #2563eb;
-    border: 1px solid #d0dcff;
-    border-radius: 999px;
-    padding: 5px 12px;
-    font-size: 12px;
-    font-weight: 600;
+  .pill-copy span {
+    font-size: 10px;
+    color: #666;
+  }
+
+  /* mini product icon grid (2 × 2) */
+  .visual-mini-grid {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 3;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    border-radius: 18px;
+    padding: 7px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  }
+
+  .visual-mini-grid img {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* gentle floating animation */
+  @keyframes float-y {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-8px); }
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .hero-visual {
+      width: 320px;
+      height: 395px;
+    }
   }
 
   @media (max-width: 768px) {
@@ -296,6 +434,15 @@ import { SITE } from '../config';
       order: -1;
     }
 
+    .hero-visual {
+      width: 290px;
+      height: 358px;
+      margin: 0 auto;
+    }
+
+    .visual-float-left  { left: -12px; }
+    .visual-float-right { right: -12px; }
+
     .hero-title {
       font-size: clamp(32px, 9vw, 40px);
     }
@@ -313,14 +460,14 @@ import { SITE } from '../config';
     .btn { width: 100%; }
 
     .hero-trust { font-size: 20px; }
-
-    .showcase-grid {
-      grid-template-columns: 1fr 1fr;
-    }
   }
 
   @media (max-width: 375px) {
     .hero-title { font-size: 34px; }
-    .showcase-grid { grid-template-columns: 1fr; }
+
+    .hero-visual {
+      width: 260px;
+      height: 320px;
+    }
   }
 </style>
