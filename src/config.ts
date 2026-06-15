@@ -5,7 +5,7 @@ export const SITE = {
     'Nairobi-based industrial supplier. Tools, pipes, valves, hoses, bearings, and custom fabrication — serving manufacturing, agricultural, and construction sectors across East Africa.',
   phone: '+254 705 954 325',
   whatsapp: '254705954325',
-  email: 'info@jaynxenterprises.co.ke',
+  email: 'jaynxenterprises@outlook.com',
   address: 'Industrial Area, Nairobi, Kenya',
 
   stats: [
